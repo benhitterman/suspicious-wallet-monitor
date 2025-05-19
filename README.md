@@ -4,7 +4,7 @@ A full-stack application that allows users to input a wallet address and receive
 <img width="1497" alt="Screenshot 2025-05-18 at 10 42 44 PM" src="https://github.com/user-attachments/assets/7e4cb256-ba43-4fa2-a4dc-6c131b4525f2" />
 
 
-## ✨ Features
+## Features
 
 - View wallets
 - View recent transactions for a wallet
@@ -14,7 +14,7 @@ A full-stack application that allows users to input a wallet address and receive
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 **Backend:**
 
