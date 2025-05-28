@@ -3,7 +3,6 @@
 A full-stack application that allows users to input a wallet address and receive information on its activity, including transaction history and potential suspicion flags. Built with **FastAPI** (Python backend), **PostgreSQL** for database interactions, and **Next.js** with **Tailwind CSS** for the frontend.
 <img width="1497" alt="Screenshot 2025-05-18 at 10 42 44 PM" src="https://github.com/user-attachments/assets/7e4cb256-ba43-4fa2-a4dc-6c131b4525f2" />
 
-
 ## Features
 
 - View wallets
@@ -88,7 +87,7 @@ npm run dev # Runs on http://localhost:3000
 
 ---
 
-## 🧪 API Endpoints
+## API Endpoints
 
 Test the API interactively on http://localhost:8000/docs
 
@@ -126,6 +125,19 @@ Add a new transaction
 }
 ```
 
+Add new suspicious transaction
+
+```json
+{
+  "tx_hash": "abc123...",
+  "wallet_address": "0x123...",
+  "amount": 100,
+  "from_address": "0x123...",
+  "to_address": "0x123malicious",
+  "status": "confirmed"
+}
+```
+
 ### `GET /transactions/{wallet_address}`
 
 Get transactions for a given wallet
@@ -134,18 +146,24 @@ Get transactions for a given wallet
 
 Check if a wallet is flagged for suspicious activity
 
+### `DELETE /wallets/{address}/`
+
+Delete wallet by address
+
+### `GET /transactions/{tx_hash}`
+
+Delete transaction by hash
+
 ---
 
 ## Suspicious Wallet Logic
 
-Currently, flagged wallets are hardcoded:
+Flagged address are hardcoded:
 
 ```python
-flagged_wallets = {
-  "0x123...": {
-    "isFlagged": True,
-    "riskLevel": "High",
-    "reason": "Associated with phishing scams"
-  }
+MALICIOUS_ADDRESSES = {
+    "0x123malicious",
+    "0x456scam",
+    "0x789fraud",
 }
 ```

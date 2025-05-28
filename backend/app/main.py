@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from .models import Wallet, Transaction
 from .database import engine, create_db_and_tables
-from .crud import create_wallet, get_wallet_by_address, get_all_wallets, create_transaction, get_transactions_by_wallet, get_transaction_by_hash
+from .crud import create_wallet, get_wallet_by_address, get_all_wallets, create_transaction, get_transactions_by_wallet, get_transaction_by_hash, delete_wallet, delete_transaction
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,10 +25,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-flagged_wallets = {
-    '0x123...': {"isFlagged": True, "riskLevel": "High", "reason": "Associated with phishing scams"},
-}
 
 @app.post("/wallets/", response_model=Wallet)
 def create_wallet_endpoint(wallet: Wallet):
@@ -59,12 +55,16 @@ def create_transaction_endpoint(transaction: Transaction):
 def get_transactions_for_wallet(wallet_address: str):
     return get_transactions_by_wallet(wallet_address)
 
-@app.get("/wallets/{address}/suspicious")
-def check_wallet_suspicious(address: str):
-    address_lower = address.lower()
-    info = flagged_wallets.get(address_lower, {
-        "isFlagged": False,
-        "riskLevel": "Low",
-        "reason": "No suspicious activity detected",
-    })
-    return JSONResponse(content={"address": address, **info})
+@app.delete("/wallets/{address}")
+def delete_wallet_endpoint(address: str):
+    success = delete_wallet(address)
+    if not success:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    return {"message": f"Wallet {address} and its transactions have been deleted."}
+
+@app.delete("/transactions/{tx_hash}")
+def delete_transaction_endpoint(tx_hash: str):
+    success = delete_transaction(tx_hash)
+    if not success:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return {"message": f"Transaction {tx_hash} deleted."}

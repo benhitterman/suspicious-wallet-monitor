@@ -3,6 +3,7 @@ export interface Wallet {
   address: string;
   owner_name?: string;
   created_at: string;
+  is_suspicious?: boolean;
 }
 
 export interface Transaction {

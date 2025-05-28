@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import WalletForm from '@/components/WalletForm';
 import WalletDetails from '@/components/WalletDetails';
-import type { Wallet, Transaction, SuspiciousInfo } from '@/types/types';
+import type { Wallet, Transaction } from '@/types/types';
 
 export default function Home() {
   const [address, setAddress] = useState<string | null>(null);
@@ -11,9 +11,6 @@ export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [suspiciousInfo, setSuspiciousInfo] = useState<SuspiciousInfo | null>(
-    null
-  );
 
   const handleWalletCreated = (newAddress: string) => {
     setAddress(newAddress);
@@ -39,15 +36,8 @@ export default function Home() {
         if (!txRes.ok) throw new Error('Failed to fetch transactions');
         const txData: Transaction[] = await txRes.json();
 
-        const susRes = await fetch(
-          `http://localhost:8000/wallets/${address}/suspicious`
-        );
-        if (!susRes.ok) throw new Error('Failed to fetch suspicion info');
-        const susData: SuspiciousInfo = await susRes.json();
-
         setWallet(walletData);
         setTransactions(txData);
-        setSuspiciousInfo(susData);
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
         else setError('Unknown error');
@@ -67,21 +57,24 @@ export default function Home() {
       {error && <p className="text-red-600">{error}</p>}
 
       {!loading && !error && wallet && (
-        <WalletDetails wallet={wallet} transactions={transactions} />
-      )}
+        <>
+          <WalletDetails wallet={wallet} transactions={transactions} />
 
-      {suspiciousInfo && suspiciousInfo.isFlagged && (
-        <div className="mt-4 p-4 bg-red-100 text-red-800 rounded">
-          <p>
-            <strong>🚩 Suspicious Wallet</strong>
-          </p>
-          <p>
-            <strong>Risk Level:</strong> {suspiciousInfo.riskLevel}
-          </p>
-          <p>
-            <strong>Reason:</strong> {suspiciousInfo.reason}
-          </p>
-        </div>
+          {wallet.is_suspicious && (
+            <div className="mt-4 p-4 bg-red-100 text-red-800 rounded">
+              <p>
+                <strong>🚩 Suspicious Wallet</strong>
+              </p>
+              <p>
+                <strong>Risk Level:</strong> High
+              </p>
+              <p>
+                <strong>Reason:</strong> Involved in transactions with known
+                malicious addresses
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

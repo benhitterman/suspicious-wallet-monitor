@@ -7,6 +7,7 @@ class Wallet(SQLModel, table=True):
     address: str = Field(index=True, unique=True)
     owner_name: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    is_suspicious: bool = Field(default=False)
 
 class Transaction(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
